@@ -1,0 +1,51 @@
+获取到中断信息
+{
+    'b6c482bc-749f-a205-4cf6-63757497dce8': [
+        {
+            'id': '3ef8781d7652f47c77e89892dcb25a32',
+            'value': {
+                'new_tags': {
+                    'tag_ids_add': [
+                        {
+                            'tag_id': 'BUY_010',
+                            'tag_name': '红酒偏好',
+                            'tag_reason': 
+'根据客户的订单信息，客户购买了奔富Bin407红酒（750ml×6瓶）以及向客服咨询红酒价值，表明客户有红酒偏好。'
+                        },
+                        {
+                            'tag_id': 'SOCIAL_020',
+                            'tag_name': '重要客人接待需求',
+                            'tag_reason': 
+'根据销售人员和客户的聊天记录，客户提到对茅台配额的需求强烈，以及为领导夫人挑选红酒，显示客户有重要客人接待的需求。'
+                        },
+                        {
+                            'tag_id': 'LIFE_016',
+                            'tag_name': '子女升学庆祝',
+                            'tag_reason': '根据销售人员和客户的聊天记录，客户提到其儿子考上了重点高中，并计划举办酒席庆祝。'
+                        }
+                    ],
+                    'tag_ids_remove': [
+                        {
+                            'tag_id': 'LIFE_018',
+                            'tag_name': '子女教育阶段（中学）',
+                            'tag_reason': 
+'根据客户的聊天记录，客户提到其儿子已经考上重点高中，子女的教育阶段可能已从中学进入高中，故建议移除此标签。'
+                        }
+                    ]
+                },
+                'old_tags': {
+                    'customer_tags': [
+                        {'tag_id': 'BASIC_002', 'tag_name': '中年男性', 'tag_reason': ''},
+                        {'tag_id': 'BASIC_003', 'tag_name': '已婚有子女', 'tag_reason': ''},
+                        {'tag_id': 'BASIC_005', 'tag_name': '家有老人', 'tag_reason': ''},
+                        {'tag_id': 'BUY_006', 'tag_name': '酱香型白酒偏好', 'tag_reason': ''},
+                        {'tag_id': 'SOCIAL_011', 'tag_name': '商务宴请需求强', 'tag_reason': ''},
+                        {'tag_id': 'SOCIAL_013', 'tag_name': '家庭宴会场景多', 'tag_reason': ''},
+                        {'tag_id': 'LIFE_018', 'tag_name': '子女教育阶段（中学）', 'tag_reason': ''}
+                    ]
+                },
+                'description': '这是帮您生成的客户标签建议，您可以确认、放弃、重新生成。'
+            }
+        }
+    ]
+}

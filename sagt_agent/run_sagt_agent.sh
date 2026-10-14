@@ -1,0 +1,6 @@
+#!/bin/bash
+echo "Sagt Agent Starting... "
+
+
+nohup uv run langgraph dev --host 0.0.0.0 --port 2024 >> sagt_agent.log 2>&1 &
+

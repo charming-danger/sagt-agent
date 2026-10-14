@@ -1,0 +1,7 @@
+#!/bin/bash
+echo "Sagt Admin Starting... "
+
+
+nohup uv run sagt_admin_app.py >> sagt_admin.log 2>&1 &
+
+echo "Sagt Admin Started"
