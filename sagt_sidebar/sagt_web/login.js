@@ -7,17 +7,14 @@ class LoginManager {
 
     init() {
         const loginForm = document.getElementById('loginForm');
-        const loginBtn = document.getElementById('loginBtn');
-        const errorMessage = document.getElementById('errorMessage');
 
-        // 检查是否已经登录
-        const token = localStorage.getItem('sagt_token');
-        if (token) {
-            this.redirectToMain();
-            return;
+        // 从主页面因登录失效跳转过来时，给出提示
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('expired') === '1') {
+            this.showError('登录已失效，请重新登录');
         }
 
-        // 绑定登录表单提交事件
+        // 绑定登录表单提交事件（无论是否已有 token 都先绑定，保证校验失败时表单可用）
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             await this.handleLogin();
@@ -29,6 +26,40 @@ class LoginManager {
                 loginForm.dispatchEvent(new Event('submit'));
             }
         });
+
+        // 检查是否已经登录：需要向后端校验 token，
+        // 避免服务重启后残留的旧 token 导致在登录页和主页面之间来回跳转
+        const token = localStorage.getItem('sagt_token');
+        if (token) {
+            this.validateToken(token);
+        }
+    }
+
+    // 向后端校验 token 是否仍然有效
+    async validateToken(token) {
+        try {
+            const response = await fetch(`${this.apiBaseUrl}/get_interrupt`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (response.ok) {
+                // token 有效，进入主页面
+                this.redirectToMain();
+                return;
+            }
+
+            if (response.status === 401) {
+                // token 已失效（服务重启或过期），清除本地登录状态，留在登录页
+                localStorage.removeItem('sagt_token');
+                localStorage.removeItem('sagt_username');
+                this.showError('登录已失效，请重新登录');
+            }
+        } catch (error) {
+            // 网络异常等情况：不跳转，留在登录页由用户自行处理
+            console.error('校验登录状态失败:', error);
+        }
     }
 
     async handleLogin() {

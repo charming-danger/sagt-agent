@@ -9,7 +9,8 @@ class SagtApp {
         this.lastNodeResults = new Map(); // 存储最新的节点结果，避免重复显示
         this.currentTaskActive = false; // 当前是否有活跃任务
         this.taskStartTime = null; // 任务开始时间
-        
+        this.authFailureHandled = false; // 是否已处理登录失效，避免重复跳转
+
         this.init();
     }
 
@@ -82,6 +83,19 @@ class SagtApp {
 
     redirectToLogin() {
         window.location.href = 'login.html';
+    }
+
+    // 统一的登录失效处理（服务重启、token 过期等收到 401 时调用）
+    // 清除本地登录状态并跳转回登录页
+    handleAuthFailure() {
+        if (this.authFailureHandled) {
+            return;
+        }
+        this.authFailureHandled = true;
+
+        localStorage.removeItem('sagt_token');
+        localStorage.removeItem('sagt_username');
+        window.location.href = 'login.html?expired=1';
     }
 
     enableInput() {
@@ -270,6 +284,12 @@ class SagtApp {
                 },
                 body: JSON.stringify(data)
             });
+
+            // 登录失效：清除本地状态并跳转登录页
+            if (response.status === 401) {
+                this.handleAuthFailure();
+                throw new Error('登录已失效，请重新登录');
+            }
 
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -487,6 +507,12 @@ class SagtApp {
                 }
             });
 
+            // 登录失效（如服务重启后 token 不在服务端会话中）：跳转登录页
+            if (response.status === 401) {
+                this.handleAuthFailure();
+                return;
+            }
+
             if (response.ok) {
                 const data = await response.json();
                 if (data.has_interrupt && data.interrupt_info) {
@@ -605,6 +631,12 @@ class SagtApp {
                     confirmed: action
                 })
             });
+
+            // 登录失效：清除本地状态并跳转登录页
+            if (response.status === 401) {
+                this.handleAuthFailure();
+                throw new Error('登录已失效，请重新登录');
+            }
 
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
