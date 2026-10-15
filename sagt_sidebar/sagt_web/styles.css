@@ -447,23 +447,40 @@ body {
     background: #fff3cd;
     border-top: 1px solid #ffeaa7;
     padding: 15px;
+    /* 允许在 flex 布局中被压缩（默认 min-height:auto 会拒绝收缩，
+       导致小视口下底部按钮溢出父容器被 overflow:hidden 裁剪） */
+    min-height: 0;
+    overflow: hidden;
+}
+
+.interrupt-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
 }
 
 .interrupt-content h3 {
     color: #856404;
     margin-bottom: 10px;
     font-size: 14px;
+    flex-shrink: 0;
 }
 
 .interrupt-content p {
     color: #856404;
     margin-bottom: 15px;
     font-size: 13px;
+    /* 描述过长时在内部滚动，保证按钮行始终可见 */
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
 }
 
 .interrupt-buttons {
     display: flex;
     gap: 8px;
+    flex-shrink: 0;
 }
 
 .confirm-btn {
