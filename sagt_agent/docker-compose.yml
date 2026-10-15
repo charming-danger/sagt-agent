@@ -36,6 +36,6 @@ services:
         env_file:
             - .env
         environment:
-            REDIS_URI: redis://langgraph-redis:16379
+            REDIS_URI: redis://langgraph-redis:6379
             LANGSMITH_API_KEY: ${LANGSMITH_API_KEY}
-            DATABASE_URI: postgres://postgres:postgres@langgraph-postgres:15432/postgres?sslmode=disable
+            DATABASE_URI: postgres://postgres:postgres@langgraph-postgres:5432/postgres?sslmode=disable
