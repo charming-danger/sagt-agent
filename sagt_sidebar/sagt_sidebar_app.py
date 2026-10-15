@@ -153,6 +153,15 @@ async def get_client(token: str) -> SagtAgentAPI:
 @app.post("/api/login", response_model=LoginResponse)
 async def login(request: LoginRequest):
     """用户登录 - 使用 sagt 账号验证"""
+    # 校验页面输入的用户名/密码，必须与配置的SAGT账号一致，
+    # 防止任意用户名（如admin）通过后被当作 configurable.user_id 透传给agent，
+    # 导致 store 查询命名空间错位（("external_user", <username>) 查不到数据）
+    if request.username != SAGT_USER_ID or request.password != SAGT_PASSWORD:
+        return LoginResponse(
+            success=False,
+            message="用户名或密码错误"
+        )
+
     try:
         client = SagtAgentAPI()
         
