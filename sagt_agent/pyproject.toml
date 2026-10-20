@@ -9,7 +9,7 @@ dependencies = [
     "langchain-community==0.4.1",
     "langchain-core==1.2.3",
     "langchain-openai==1.1.6",
-    "langfuse==3.11.0",
+    "langfuse==4.18.0",
     "langgraph==1.0.5",
     "langgraph-api==0.6.9",
     "langgraph-cli==0.4.11",
