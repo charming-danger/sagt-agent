@@ -1,0 +1,6 @@
+{
+  "name": "sagt-sidebar-pages",
+  "private": true,
+  "type": "module",
+  "description": "Cloudflare Pages deployment of Sagt Sidebar demo (static frontend + Pages Functions mock agent API)"
+}
