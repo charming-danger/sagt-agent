@@ -1,4 +1,4 @@
-import operator
+﻿import operator
 from typing import TypedDict, Annotated, List
 from enum import Enum
 from langgraph.graph import StateGraph, START, END
@@ -105,7 +105,7 @@ def just_talk_node(state: SubTalkState, config: RunnableConfig):
             )]  
         }
 
-builder = StateGraph(state_schema=SubTalkState, input_schema=SubTalkInputState, output_schema=SubTalkOutputState, config_schema=SagtConfig)
+builder = StateGraph(state_schema=SubTalkState, input_schema=SubTalkInputState, output_schema=SubTalkOutputState, context_schema=SagtConfig)
 
 builder.add_node(NodeName.WELCOME_MESSAGE.value, welcome_message_node)
 builder.add_node(NodeName.JUST_TALK.value, just_talk_node)
