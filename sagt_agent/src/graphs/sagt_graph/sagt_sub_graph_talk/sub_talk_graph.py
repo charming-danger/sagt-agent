@@ -72,7 +72,7 @@ def just_talk_node(state: SubTalkState, config: RunnableConfig):
                     execute_node_name=NodeName.JUST_TALK.value,
                     execute_result_code=1,
                     execute_result_msg="生成回复失败",
-                    execute_exceptions=[f"生成回复失败: {e}"]
+                    execute_exceptions=["模型返回内容为空"]
                 )]
             }
 

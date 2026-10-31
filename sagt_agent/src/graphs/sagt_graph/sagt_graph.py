@@ -39,17 +39,34 @@ builder.add_node(NodeName.PROFILE_SUGGESTION.value, sub_profile_graph) ## 生成
 builder.add_node(NodeName.SCHEDULE_SUGGESTION.value, sub_schedule_graph) ## 生成客户日程
 builder.add_node(NodeName.NO_CLEAR_INTENTION.value, sub_talk_graph) ## 未明确意图
 
-## 加载数据节点执行完成后，调用意图检测节点
+## 加载数据并行拓扑（v2 工程优化）：
+## 原实现为 7 节点串行链，加载总耗时 = Σ 各次 store 访问；
+## 现改为 fan-out/fan-in：
+##   welcome ─┬─ employee ─┐
+##            ├─ tag       │
+##            ├─ customer ─┼─(customer 完成后) order
+##            ├─ chat      │
+##            └─ kf ───────┴─→ intent_detection（fan-in 屏障）
+## 正确性依据：各节点写入字段互不重叠，NODE_RESULT 由 reducer 合并；
+## order 依赖 customer 写入的 CUSTOMER_INFO，用显式边保证先后。
 builder.add_edge(START, NodeName.CLEANUP_STATE.value)
 builder.add_edge(NodeName.CLEANUP_STATE.value, NodeName.WELCOME_MESSAGE.value)
 builder.add_edge(NodeName.WELCOME_MESSAGE.value, LoadDataNodeName.LOAD_WELCOME_MESSAGE.value)
+
 builder.add_edge(LoadDataNodeName.LOAD_WELCOME_MESSAGE.value, LoadDataNodeName.LOAD_EMPLOYEE_INFO.value)
-builder.add_edge(LoadDataNodeName.LOAD_EMPLOYEE_INFO.value, LoadDataNodeName.LOAD_TAG_SETTING.value)
-builder.add_edge(LoadDataNodeName.LOAD_TAG_SETTING.value, LoadDataNodeName.LOAD_CUSTOMER_INFO.value)
-builder.add_edge(LoadDataNodeName.LOAD_CUSTOMER_INFO.value, LoadDataNodeName.LOAD_CHAT_HISTORY.value)
-builder.add_edge(LoadDataNodeName.LOAD_CHAT_HISTORY.value, LoadDataNodeName.LOAD_KF_CHAT_HISTORY.value)
-builder.add_edge(LoadDataNodeName.LOAD_KF_CHAT_HISTORY.value, LoadDataNodeName.LOAD_ORDER_HISTORY.value)
-builder.add_edge(LoadDataNodeName.LOAD_ORDER_HISTORY.value, NodeName.INTENT_DETECTION.value)
+builder.add_edge(LoadDataNodeName.LOAD_WELCOME_MESSAGE.value, LoadDataNodeName.LOAD_TAG_SETTING.value)
+builder.add_edge(LoadDataNodeName.LOAD_WELCOME_MESSAGE.value, LoadDataNodeName.LOAD_CUSTOMER_INFO.value)
+builder.add_edge(LoadDataNodeName.LOAD_WELCOME_MESSAGE.value, LoadDataNodeName.LOAD_CHAT_HISTORY.value)
+builder.add_edge(LoadDataNodeName.LOAD_WELCOME_MESSAGE.value, LoadDataNodeName.LOAD_KF_CHAT_HISTORY.value)
+
+## 订单依赖客户信息（union_id 取自 state，不再重复查 store）
+builder.add_edge(LoadDataNodeName.LOAD_CUSTOMER_INFO.value, LoadDataNodeName.LOAD_ORDER_HISTORY.value)
+
+## fan-in：全部加载完成后进入意图检测
+for load_node in (LoadDataNodeName.LOAD_EMPLOYEE_INFO, LoadDataNodeName.LOAD_TAG_SETTING,
+                  LoadDataNodeName.LOAD_ORDER_HISTORY, LoadDataNodeName.LOAD_CHAT_HISTORY,
+                  LoadDataNodeName.LOAD_KF_CHAT_HISTORY):
+    builder.add_edge(load_node.value, NodeName.INTENT_DETECTION.value)
 
 ## 意图检测后，根据意图调用对应的子图：
 ## 1. 如果意图是客户聊天建议，则调用sub_chat_suggestion_graph

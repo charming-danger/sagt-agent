@@ -134,7 +134,7 @@ def load_customer_info_node(state: SagtState, config: RunnableConfig):
         return {
             SagtStateField.CUSTOMER_INFO: CustomerInfo(),
             SagtStateField.CUSTOMER_PROFILE: CustomerProfile(),
-            SagtStateField.CUSTOMER_TAGS: [],
+            SagtStateField.CUSTOMER_TAGS: CustomerTags(),
             SagtStateField.NODE_RESULT: [NodeResult(
                 execute_node_name=NodeName.LOAD_CUSTOMER_INFO.value,
                 execute_result_code=1,
@@ -223,18 +223,15 @@ def load_kf_chat_history_node(state: SagtState, config: RunnableConfig):
 
 
 def load_order_history_node(state: SagtState, config: RunnableConfig):
-    """加载订单信息节点"""
-    
+    """加载订单信息节点
+
+    依赖 load_customer_info_node 先行写入的 CUSTOMER_INFO（并行拓扑中
+    由 customer→order 边保证），不再重复访问 store。
+    """
+
     logger.info("=== 加载订单信息 ===")
 
-    follow_user_id = config[ConfigurableField.configurable][ConfigurableField.user_id]
-    external_id    = config[ConfigurableField.configurable][ConfigurableField.external_id]
-    
-    logger.info(f"follow_user_id: {follow_user_id}")
-    logger.info(f"external_id: {external_id}")
-    
-    customer_info: CustomerInfo = get_customer_info(external_id = external_id, follow_user_id = follow_user_id)
-
+    customer_info: CustomerInfo = state.get(SagtStateField.CUSTOMER_INFO) or CustomerInfo()
     union_id = customer_info.union_id
 
     # 直接调用工具函数，传递配置
