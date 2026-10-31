@@ -1,4 +1,4 @@
-from langgraph.graph import START, END, StateGraph
+﻿from langgraph.graph import START, END, StateGraph
 from graphs.sagt_graph.sagt_sub_graph_kf_chat_suggestion.sub_kf_chat_suggestion_state import SubKFChatSuggestionState
 from graphs.sagt_graph.sagt_sub_graph_kf_chat_suggestion.sub_kf_chat_suggestion_state import SubKFChatSuggestionInputState
 from graphs.sagt_graph.sagt_sub_graph_kf_chat_suggestion.sub_kf_chat_suggestion_state import SubKFChatSuggestionOutputState
@@ -11,7 +11,7 @@ builder = StateGraph(
     state_schema=SubKFChatSuggestionState, 
     input_schema=SubKFChatSuggestionInputState, 
     output_schema=SubKFChatSuggestionOutputState, 
-    config_schema=SagtConfig
+    context_schema=SagtConfig
 )
 
 builder.add_node(NodeName.WELCOME_MESSAGE.value, welcome_message_node)

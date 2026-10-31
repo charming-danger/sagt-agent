@@ -1,4 +1,4 @@
-from langgraph.graph import START, END, StateGraph
+﻿from langgraph.graph import START, END, StateGraph
 from graphs.sagt_graph.sagt_state import SagtState, InputState, OutputState, SagtConfig
 
 from graphs.sagt_graph.sagt_sub_graph_profile.sub_profile_graph import sub_profile_graph
@@ -15,7 +15,7 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 
-builder = StateGraph(state_schema=SagtState, input_schema=InputState, output_schema=OutputState, config_schema=SagtConfig)
+builder = StateGraph(state_schema=SagtState, input_schema=InputState, output_schema=OutputState, context_schema=SagtConfig)
 
 builder.add_node(NodeName.CLEANUP_STATE.value, cleanup_state_node) ## 清理状态
 builder.add_node(NodeName.WELCOME_MESSAGE.value, welcome_message) ## 欢迎消息

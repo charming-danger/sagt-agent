@@ -1,10 +1,10 @@
-from langgraph.graph import START, END, StateGraph
+﻿from langgraph.graph import START, END, StateGraph
 from graphs.sagt_graph.sagt_sub_graph_profile.sub_profile_state import SubProfileState, SubProfileInputState, SubProfileOutputState
 from graphs.sagt_graph.sagt_sub_graph_profile.sub_profile_node import generate_customer_profile, update_customer_profile, human_feedback, notify_human_feedback, welcome_message, notify_human_result
 from graphs.sagt_graph.sagt_sub_graph_profile.sub_profile_node import NodeName
 from graphs.sagt_graph.sagt_state import SagtConfig
 
-builder = StateGraph(state_schema=SubProfileState, input_schema=SubProfileInputState, output_schema=SubProfileOutputState, config_schema=SagtConfig)
+builder = StateGraph(state_schema=SubProfileState, input_schema=SubProfileInputState, output_schema=SubProfileOutputState, context_schema=SagtConfig)
 
 builder.add_node(NodeName.WELCOME_MESSAGE.value, welcome_message)
 builder.add_node(NodeName.PROFILE_SUGGEST.value, generate_customer_profile)

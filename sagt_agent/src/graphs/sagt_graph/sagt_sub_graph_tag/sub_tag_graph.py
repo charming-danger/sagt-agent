@@ -1,10 +1,10 @@
-from langgraph.graph import START, END, StateGraph
+﻿from langgraph.graph import START, END, StateGraph
 from graphs.sagt_graph.sagt_sub_graph_tag.sub_tag_state import SubTagState, SubTagInputState, SubTagOutputState
 from graphs.sagt_graph.sagt_sub_graph_tag.sub_tag_node import generate_customer_tag, update_customer_tag, human_feedback, welcome_message_node, notify_human_feedback, notify_human_result
 from graphs.sagt_graph.sagt_sub_graph_tag.sub_tag_node import NodeName
 from graphs.sagt_graph.sagt_state import SagtConfig
 
-builder = StateGraph(state_schema=SubTagState, input_schema=SubTagInputState, output_schema=SubTagOutputState, config_schema=SagtConfig)
+builder = StateGraph(state_schema=SubTagState, input_schema=SubTagInputState, output_schema=SubTagOutputState, context_schema=SagtConfig)
 
 builder.add_node(NodeName.WELCOME_MESSAGE.value, welcome_message_node)
 builder.add_node(NodeName.GENERATE_TAG.value, generate_customer_tag)

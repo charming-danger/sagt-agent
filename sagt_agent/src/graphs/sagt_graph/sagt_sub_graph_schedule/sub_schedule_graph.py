@@ -1,10 +1,10 @@
-from langgraph.graph import START, END, StateGraph
+﻿from langgraph.graph import START, END, StateGraph
 from graphs.sagt_graph.sagt_sub_graph_schedule.sub_schedule_state import SubScheduleState, SubScheduleInputState, SubScheduleOutputState
 from graphs.sagt_graph.sagt_sub_graph_schedule.sub_schedule_node import generate_schedule_node, create_schedule_node, welcome_message_node
 from graphs.sagt_graph.sagt_sub_graph_schedule.sub_schedule_node import NodeName
 from graphs.sagt_graph.sagt_state import SagtConfig
 
-builder = StateGraph(state_schema=SubScheduleState, input_schema=SubScheduleInputState, output_schema=SubScheduleOutputState, config_schema=SagtConfig)
+builder = StateGraph(state_schema=SubScheduleState, input_schema=SubScheduleInputState, output_schema=SubScheduleOutputState, context_schema=SagtConfig)
 
 builder.add_node(NodeName.WELCOME_MESSAGE.value, welcome_message_node)
 builder.add_node(NodeName.GENERATE_SCHEDULE.value, generate_schedule_node)
