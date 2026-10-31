@@ -89,3 +89,20 @@ def test_e2e_cleanup_resets_node_result(patched):
     out1 = _run(graph, "随便聊聊")
     out2 = _run(graph, "随便聊聊")
     assert len(out2["node_result"]) == len(out1["node_result"])
+
+
+def test_talk_empty_output_no_secondary_crash(monkeypatch):
+    """回归 K3：模型空输出分支曾因 f-string 引用未定义的 e 抛 NameError 二次崩溃"""
+    import graphs.sagt_graph.sagt_sub_graph_talk.sub_talk_graph as st
+    import llm.llm_just_talk as talk
+    from langchain_core.messages import AIMessage
+
+    class EmptyLLM:
+        def invoke(self, prompt):
+            return AIMessage(content="")
+
+    monkeypatch.setattr(talk, "llm", EmptyLLM())
+    out = st.just_talk_node({"task_input": "hi"}, {})
+    assert out["task_result"].task_result_code == 1
+    assert out["node_result"][0].execute_exceptions == ["模型返回内容为空"]
+
