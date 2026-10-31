@@ -1,4 +1,5 @@
 from typing import List, Dict, Any
+import os
 from datetime import datetime, timedelta
 from models.sagt_models import CustomerInfo, TagInfo, ChatHistory, KFChatHistory, EmployeeInfo
 from models.sagt_models import OrderInfo, OrderHistory, TagSetting, ChatMessage, CustomerProfile, CustomerTags
@@ -143,27 +144,26 @@ def get_chat_history(external_id: str, follow_user_id: str) -> ChatHistory:
             receiver = "销售人员"
         
         chat_history.chat_msgs.append(ChatMessage(sender=sender, receiver=receiver, content=content, msg_time=msg_time))
-    
-    ## 增加员工回复
-    chat_history.chat_msgs.append(
-        ChatMessage(
-            sender="销售人员", 
-            receiver="客户", 
-            content="程哥，这是您辛苦培养的成果，真是让人敬佩，后面如果需要庆祝一下，或者需要什么帮助，都可以找我。", 
-            msg_time=(datetime.now() - timedelta(minutes=20)).strftime("%Y-%m-%d %H:%M:%S")
+
+    ## 演示用假消息：仅在显式开启 SAGT_DEMO_MODE 时注入（课程演示需要"酒席"上下文触发日程场景）。
+    ## 生产路径不得注入——假消息会进入 Prompt 污染模型输入，且无法审计来源。
+    if os.getenv("SAGT_DEMO_MODE", "false").lower() == "true":
+        chat_history.chat_msgs.append(
+            ChatMessage(
+                sender="销售人员",
+                receiver="客户",
+                content="程哥，这是您辛苦培养的成果，真是让人敬佩，后面如果需要庆祝一下，或者需要什么帮助，都可以找我。",
+                msg_time=(datetime.now() - timedelta(minutes=20)).strftime("%Y-%m-%d %H:%M:%S")
+            )
         )
-    )
-
-    chat_history.chat_msgs.append(
-        ChatMessage(
-            sender="客户", 
-            receiver="销售人员", 
-            content="正想办个酒席，庆祝一下。明天上午10点左右，我去你那里找你商量一下筹办酒席的事情。", 
-            msg_time=(datetime.now() - timedelta(minutes=10)).strftime("%Y-%m-%d %H:%M:%S")
+        chat_history.chat_msgs.append(
+            ChatMessage(
+                sender="客户",
+                receiver="销售人员",
+                content="正想办个酒席，庆祝一下。明天上午10点左右，我去你那里找你商量一下筹办酒席的事情。",
+                msg_time=(datetime.now() - timedelta(minutes=10)).strftime("%Y-%m-%d %H:%M:%S")
+            )
         )
-    )
-
-
 
     return chat_history
 

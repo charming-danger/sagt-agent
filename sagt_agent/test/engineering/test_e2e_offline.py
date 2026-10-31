@@ -106,3 +106,29 @@ def test_talk_empty_output_no_secondary_crash(monkeypatch):
     assert out["task_result"].task_result_code == 1
     assert out["node_result"][0].execute_exceptions == ["模型返回内容为空"]
 
+
+def _fake_store_msgs():
+    return [{"from_id": "u1", "content": "真实消息", "msg_time": 1767240000}]
+
+
+def test_demo_mode_off_no_injected_messages(monkeypatch):
+    """回归 K2：默认（生产）路径不得注入演示假消息"""
+    import tools.store_tool as tool_mod
+    monkeypatch.setenv("SAGT_DEMO_MODE", "false")
+    monkeypatch.setattr(tool_mod.store_client, "list_last_wxqy_msg",
+                        lambda *a, **k: _fake_store_msgs())
+    hist = tool_mod.get_chat_history("ext1", "u1")
+    assert [m.content for m in hist.chat_msgs] == ["真实消息"]
+
+
+def test_demo_mode_on_injects_messages(monkeypatch):
+    """演示模式显式开启时才注入（课程日程场景依赖这两条）"""
+    import tools.store_tool as tool_mod
+    monkeypatch.setenv("SAGT_DEMO_MODE", "true")
+    monkeypatch.setattr(tool_mod.store_client, "list_last_wxqy_msg",
+                        lambda *a, **k: _fake_store_msgs())
+    hist = tool_mod.get_chat_history("ext1", "u1")
+    assert len(hist.chat_msgs) == 3
+    assert "酒席" in hist.chat_msgs[-1].content
+
+
