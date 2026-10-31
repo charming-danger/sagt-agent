@@ -4,8 +4,19 @@ from typing import List, Dict, Any, Optional
 from langgraph.store.base import SearchItem, Item
 
 class StoreClient:
-    def __init__(self):
-        self.store = get_store()
+    """LangGraph Store 客户端。
+
+    注意：get_store() 依赖 LangGraph 运行时上下文（RunnableConfig），
+    只能在节点执行期间调用，不能在模块导入期/构造期调用，
+    否则离线单测、脚本导入、非 server 模式都会炸。
+    因此 store 采用懒加载：属性访问时才解析当前运行上下文的 store。
+    """
+
+    @property
+    def store(self):
+        # 不缓存：不同运行上下文（server / 单测 InMemoryStore）解析出的 store 不同，
+        # 缓存会让第二个上下文拿到错误的 store。get_store() 本身只是上下文字典查找，开销可忽略。
+        return get_store()
 
     # ==================== 辅助工具 ====================
     def item2dict(self, item: Item) -> Dict[str, Any]:
